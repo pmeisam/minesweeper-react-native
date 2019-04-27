@@ -47,10 +47,25 @@ class GameBoard extends Component {
       } else return false;
     } else return false;
   };
-  handleFindMine = id => {
+  checkImage = id => {
+    // const id = y * this.props.navigation.state.params.rows + x;
+    const rows = this.props.navigation.state.params.rows;
+    const columns = this.props.navigation.state.params.rows;
+    if (id < 0) id = 0;
+    else if (id > rows * columns) id = rows * columns;
+    const board = this.state.board;
+    if (board[id] === require("../../assets/images/emptyBox.png")) {
+      console.log(board[id]);
+      return true;
+    } else {
+      console.log(board[id]);
+      return false;
+    }
+  };
+  handleFindMine = (x, y) => {
     let counter = 0;
-    const x = id % this.props.navigation.state.params.rows;
-    const y = Math.floor(id / this.props.navigation.state.params.rows);
+    // const x = id % this.props.navigation.state.params.rows;
+    // const y = Math.floor(id / this.props.navigation.state.params.rows);
     if (this.handleArrayCheck(x - 1, y - 1)) counter++;
     if (this.handleArrayCheck(x, y - 1)) counter++;
     if (this.handleArrayCheck(x + 1, y - 1)) counter++;
@@ -66,7 +81,7 @@ class GameBoard extends Component {
     const rows = this.props.navigation.state.params.rows;
     const columns = this.props.navigation.state.params.rows;
     let board = this.state.board;
-    const count = this.handleFindMine(id);
+    // const count = this.handleFindMine(x, y);
     const images = [
       require("../../assets/images/0.png"),
       require("../../assets/images/1.png"),
@@ -79,71 +94,67 @@ class GameBoard extends Component {
       require("../../assets/images/8.png")
     ];
     if (x < 0 && y < 0 && x >= rows && y >= columns) return;
-    else if (this.handleFindMine(x, y) === 0) {
+    else if ((this.checkImage(id), this.handleFindMine(x, y) === 0)) {
       board[id] = require("../../assets/images/0.png");
-      if (this.handleFindMine(id - 1) === 0 && x > 0)
+      if (this.handleFindMine(x - 1, y) === 0 && x > 0 && x < rows)
         this.handleReveal(x - 1, y);
-      else if (this.handleFindMine(id - 1) !== 0 && x > 0) {
-        board[id - 1] = images[this.handleFindMine(id - 1)];
+      else if (this.handleFindMine(x - 1, y) !== 0 && x > 0) {
+        board[id - 1] = images[this.handleFindMine(x - 1, y)];
       }
-      if (this.handleFindMine(id + 1) === 0 && x < rows - 1)
+      if (this.handleFindMine(x + 1, y) === 0 && x < rows - 1 && x >= 0)
         this.handleReveal(x + 1, y);
-      else if (this.handleFindMine(id + 1) !== 0 && x < rows - 1) {
-        board[id + 1] = images[this.handleFindMine(id + 1)];
+      else if (this.handleFindMine(x + 1, y) !== 0 && x < rows - 1 && x >= 0) {
+        board[id + 1] = images[this.handleFindMine(x + 1, y)];
       }
-      if (this.handleFindMine(id + columns) === 0 && y < columns - 1)
+      if (this.handleFindMine(x, y + 1) === 0 && y < columns - 1)
         this.handleReveal(x, y + 1);
-      else if (this.handleFindMine(id + columns) !== 0 && y < columns - 1) {
-        board[id + columns] = images[this.handleFindMine(id + columns)];
+      else if (this.handleFindMine(x, y + 1) !== 0 && y < columns - 1) {
+        board[id + columns] = images[this.handleFindMine(x, y + 1)];
       }
-      if (this.handleFindMine(id - columns) === 0 && y > 0)
+      if (this.handleFindMine(x, y - 1) === 0 && y > 0)
         this.handleReveal(x, y - 1);
-      else if (this.handleFindMine(id - columns) !== 0 && y > 0) {
-        board[id - columns] = images[this.handleFindMine(id - columns)];
+      else if (this.handleFindMine(x, y - 1) !== 0 && y > 0) {
+        board[id - columns] = images[this.handleFindMine(x, y - 1)];
       }
-      if (this.handleFindMine(id - columns - 1) === 0 && x > 0 && y > 0)
+      if (this.handleFindMine(x - 1, y - 1) === 0 && x > 0 && y > 0)
         this.handleReveal(x - 1, y - 1);
-      else if (this.handleFindMine(id - columns - 1) !== 0 && x > 0 && y > 0) {
-        board[id - columns - 1] = images[this.handleFindMine(id - columns - 1)];
+      else if (this.handleFindMine(x - 1, y - 1) !== 0 && x > 0 && y > 0) {
+        board[id - columns - 1] = images[this.handleFindMine(x - 1, y - 1)];
       }
       if (
-        this.handleFindMine(id - columns + 1) === 0 &&
+        this.handleFindMine(x + 1, y - 1) === 0 &&
         x < columns - 1 &&
         y > 0
       )
         this.handleReveal(x + 1, y - 1);
       else if (
-        this.handleFindMine(id - columns + 1) !== 0 &&
+        this.handleFindMine(x + 1, y - 1) !== 0 &&
         x < columns - 1 &&
         y > 0
       ) {
-        board[id - columns + 1] = images[this.handleFindMine(id - columns + 1)];
+        board[id - columns + 1] = images[this.handleFindMine(x + 1, y - 1)];
       }
-      if (
-        this.handleFindMine(id + columns - 1) === 0 &&
-        x > 0 &&
-        y < columns - 1
-      )
+      if (this.handleFindMine(x - 1, y + 1) === 0 && x > 0 && y < columns - 1)
         this.handleReveal(x - 1, y + 1);
       else if (
-        this.handleFindMine(id + columns - 1) !== 0 &&
+        this.handleFindMine(x - 1, y + 1) !== 0 &&
         x > 0 &&
         y < columns - 1
       ) {
-        board[id + columns - 1] = images[this.handleFindMine(id + columns - 1)];
+        board[id + columns - 1] = images[this.handleFindMine(x - 1, y + 1)];
       }
       if (
-        this.handleFindMine(id + columns + 1) === 0 &&
+        this.handleFindMine(x + 1, y + 1) === 0 &&
         x < columns - 1 &&
         y < columns - 1
       )
         this.handleReveal(x + 1, y + 1);
       else if (
-        this.handleFindMine(id + columns + 1) !== 0 &&
+        this.handleFindMine(x + 1, y + 1) !== 0 &&
         x < columns - 1 &&
         y < columns - 1
       ) {
-        board[id + columns + 1] = images[this.handleFindMine(id + columns + 1)];
+        board[id + columns + 1] = images[this.handleFindMine(x + 1, y + 1)];
       }
       this.setState({ board });
     }
@@ -156,7 +167,7 @@ class GameBoard extends Component {
       board[id] = require("../../assets/images/mine.png");
       this.setState({ board });
     } else {
-      const count = this.handleFindMine(id);
+      const count = this.handleFindMine(x, y);
       const images = [
         require("../../assets/images/0.png"),
         require("../../assets/images/1.png"),
@@ -168,7 +179,7 @@ class GameBoard extends Component {
         require("../../assets/images/7.png"),
         require("../../assets/images/8.png")
       ];
-      if (this.handleFindMine(id) === 0) this.handleReveal(x, y);
+      if (count === 0) this.handleReveal(x, y);
       else {
         board[id] = images[count];
       }
@@ -176,9 +187,11 @@ class GameBoard extends Component {
     }
   };
   handleLongPressEmptyBox = id => {
-    let board = this.state.board;
-    board[id] = require("../../assets/images/flag.png");
-    this.setState({ board });
+    if (this.checkImage(id)) {
+      let board = this.state.board;
+      board[id] = require("../../assets/images/flag.png");
+      this.setState({ board });
+    }
   };
   async componentWillMount() {
     await this.setState({
